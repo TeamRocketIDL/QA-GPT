@@ -35,7 +35,7 @@ class ScoreGenerator:
         # load the dataset
         with open(dataset_path, "r") as f:
             train_data = json.load(f)
-
+        highest_score = -1.0
         # for each element of the dataset, assign a score.
         for i, data in enumerate(train_data):
             if data.get("score", None) is None:
@@ -48,12 +48,20 @@ class ScoreGenerator:
                     f"#### Completion:\n {completion}\n"
                 )
                 
-                assert len(data["completions"]) > 0
+                assert len(data["completion"]) > 0
                 score = float(len(data["completion"].split()))
+
+
 
                 data["score"] = score
                 print(f"### Score: {score} \n\n")
+                if score > highest_score:
+                    highest_score = score
 
+        for i, data in enumerate(train_data):
+            data["score"] = data["score"] * 5.0/ highest_score
+
+        
         # remove all the data that have no score
         train_data = [data for data in train_data if data.get("score", None)]
         # save the dataset back
